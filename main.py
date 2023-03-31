@@ -120,7 +120,7 @@ class wificracker(tk.Frame):
     def scan_networks(self):
         target = self.target_input.get()
         interface = self.interface_input.get()
-        command = f"sudo NetworkManager stop && sudo airmon-ng check kill && service nesudo airodump-ng {interface}"
+        command = f"sudo NetworkManager stop && sudo airmon-ng check kill && sudo airmon-ng start {interface} && sudo airodump-ng {interface}mon"
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,

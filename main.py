@@ -92,16 +92,27 @@ class wificracker(tk.Frame):
             stderr=subprocess.PIPE,
             shell=True,
         )
-        output, error = process.communicate()
-        if error:
-            self.output.insert(tk.END, f"Error:\n\n{error.decode()}")
-        else:
-            self.output.insert(tk.END, f"Output:\n\n{output.decode()}")
-
+    
+        try:
+            # Выводим результаты в режиме реального времени
+            for line in iter(process.stdout.readline, b''):
+                self.output.insert(tk.END, line.decode())
+    
+        except KeyboardInterrupt:
+            # Обрабатываем прерывание через ctrl+c
+            process.kill()
+    
+        finally:
+            output, error = process.communicate()
+            if error:
+                self.output.insert(tk.END, f"Error:\n\n{error.decode()}")
+            else:
+                self.output.insert(tk.END, f"Output:\n\n{output.decode()}")
+    
         self.instructions.destroy()
         self.interface_input.destroy()
         self.scan_button.destroy()
-
+    
         self.instructions2 = tk.Label(
             self.master,
             text="Select the target network's MAC address, then enter the channel,\nthen click Capture below:",

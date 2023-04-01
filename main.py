@@ -85,7 +85,7 @@ class wificracker(tk.Frame):
 
     def scan_networks(self):
         interface = self.interface_input.get()
-        command = f"sudo airmon-ng check kill && sudo airmon-ng start {interface} && sleep 5 && sudo airodump-ng {interface}mon"
+        command = f"sudo airmon-ng check kill && sudo airmon-ng start {interface} && sudo airodump-ng {interface}mon"
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
@@ -215,7 +215,7 @@ class wificracker(tk.Frame):
         if not dist:
             dist = "0"
 
-        command = f"airodump-ng {interface} --bssid {bssid} -c {channel} -w {path} | xterm -e aireplay-ng -0 {dist} -a {bssid} {interface}"
+        command = f"sudo airodump-ng {interface} --bssid {bssid} -c {channel} -w {path} | sudo aireplay-ng -0 {dist} -a {bssid} {interface}"
         process = subprocess.Popen(
             ["/bin/bash", "-c", command],
             stdout=subprocess.PIPE,

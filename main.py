@@ -85,7 +85,7 @@ class wificracker(tk.Frame):
 
     def scan_networks(self):
         interface = self.interface_input.get()
-        command = f"sudo airmon-ng check kill && sudo airmon-ng start {interface} && timeout 5s sudo airodump-ng {interface}mon"
+        command = f"sudo airmon-ng check kill && sudo airmon-ng start {interface} && timeout 5s sudo airodump-ng {interface}mon" #ПОПРОБОВАТЬ TIMEOUT С SUDO!!!!!!!!!!!!
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,

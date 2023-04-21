@@ -1,5 +1,6 @@
 import tkinter as tk
 from scapy.all import *
+import netifaces
 
 class wificracker(tk.Frame):
     def __init__(self, master=None):
@@ -39,15 +40,11 @@ class wificracker(tk.Frame):
         )
         self.interface_label.grid(row=2, column=0)
 
-        self.interface_input = tk.Entry(
-            self.master,
-            width=40,
-            borderwidth=2,
-            fg="#FFFFFF",
-            bg="#2C2C32",
-            font=("Courier", 14),
-        )
-        self.interface_input.grid(row=3, column=0, pady=10)
+        self.interfaces = netifaces.interfaces()
+        self.interface_input = tk.StringVar()
+        self.interface_dropdown = tk.OptionMenu(self.master, self.interface_input, *self.interfaces)
+        self.interface_dropdown.config(width=40, font=("Courier", 14), fg="#FFFFFF", bg="#2C2C32", borderwidth=2)
+        self.interface_dropdown.grid(row=3, column=0, pady=10)
 
         self.scan_button = tk.Button(
             self.master,
@@ -203,7 +200,7 @@ class wificracker(tk.Frame):
         self.output.insert(tk.END, output_text)
 
         self.instructions.grid_forget()
-        self.interface_input.grid_forget()
+        self.interface_dropdown.grid_forget()
         self.scan_button.grid_forget()
 
         self.create_second_step_widgets(networks)
@@ -233,3 +230,4 @@ root = tk.Tk()
 root.title("WIFICRACKER")
 app = wificracker(master=root)
 app.mainloop()
+

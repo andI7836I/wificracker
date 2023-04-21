@@ -1,5 +1,5 @@
 import tkinter as tk
-from subprocess import Popen, PIPE
+from scapy.all import *
 
 class wificracker(tk.Frame):
     def __init__(self, master=None):
@@ -83,7 +83,7 @@ class wificracker(tk.Frame):
         )
         self.output.grid(row=6, column=0, padx=20)
 
-    def create_second_step_widgets(self):
+    def create_second_step_widgets(self, networks):
         self.instructions2 = tk.Label(
             self.master,
             text="Select the target network's MAC address, then enter the channel,\nthen click Capture below:",
@@ -104,15 +104,10 @@ class wificracker(tk.Frame):
         )
         self.target_label.grid(row=2, column=0)
 
-        self.target_input = tk.Entry(
-            self.master,
-            width=40,
-            borderwidth=2,
-            fg="#FFFFFF",
-            bg="#2C2C32",
-            font=("Courier", 14),
-        )
-        self.target_input.grid(row=3, column=0, pady=10)
+        self.target_input = tk.StringVar()
+        self.target_dropdown = tk.OptionMenu(self.master, self.target_input, *networks)
+        self.target_dropdown.config(width=40, font=("Courier", 14), fg="#FFFFFF", bg="#2C2C32", borderwidth=2)
+        self.target_dropdown.grid(row=3, column=0, pady=10)
 
         self.channel_label = tk.Label(
             self.master,
@@ -189,30 +184,29 @@ class wificracker(tk.Frame):
 
     def scan_networks(self):
         interface = self.interface_input.get()
-        command = f"sudo airmon-ng check kill && sudo airmon-ng start {interface} && timeout 5s sudo airodump-ng {interface}mon"
-        process = Popen(
-            command,
-            stdout=PIPE,
-            stderr=PIPE,
-            shell=True,
-        )
+        networks = []
+        ssid_list = []
 
-        for line in iter(process.stdout.readline, b''):
-            self.output.insert(tk.END, line.decode())
+        # Use Scapy to get all access points and their associated details
+        sniffed_packets = sniff(iface=interface, timeout=10, count=1)
+        for packet in sniffed_packets:
+            if packet.haslayer(Dot11Beacon):
+                bssid = packet[Dot11].addr2.upper()
+                if bssid not in networks:
+                    networks.append(bssid)
+                    ssid_list.append(packet[Dot11Elt].info.decode())
 
-        exit_code = process.wait()
-        if exit_code != 0:
-            error = process.stderr.read().decode()
-            self.output.insert(tk.END, f"Error:\n\n{error}")
-        else:
-            output = process.stdout.read().decode()
-            self.output.insert(tk.END, f"Output:\n\n{output}")
+        # Display the list of found wifi BSSID and SSIDs
+        output_text = ""
+        for i in range(len(networks)):
+            output_text += f"Network {i+1} BSSID: {networks[i]}, SSID: {ssid_list[i]}\n\n"
+        self.output.insert(tk.END, output_text)
 
         self.instructions.grid_forget()
         self.interface_input.grid_forget()
         self.scan_button.grid_forget()
 
-        self.create_second_step_widgets()
+        self.create_second_step_widgets(networks)
 
     def capture(self):
         interface = self.interface_input.get()
@@ -239,5 +233,3 @@ root = tk.Tk()
 root.title("WIFICRACKER")
 app = wificracker(master=root)
 app.mainloop()
-
-
